@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using RestSharp;
 using Web_Api_Authentication.Interfaces.Services;
 using Web_Api_Authentication.Models;
 using Web_Api_Authentication.ViewModels;
@@ -9,7 +11,6 @@ namespace Web_Api_Authentication.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private const string URL_EXTERNAL_API = "http://168.138.231.9:10666";
         private readonly IUserService _service;
 
         public UserController(IUserService service)
@@ -23,7 +24,7 @@ namespace Web_Api_Authentication.Controllers
         {
             var response = await _service.GetToken(model);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            if (IsHttpCodeOk(response))
                 return Ok(response.Content);
 
             return BadRequest(response.Content);
@@ -34,7 +35,7 @@ namespace Web_Api_Authentication.Controllers
         public async Task<IActionResult> GetAllUsers(string token)
         {
             var response = await _service.GetAllUsers(token);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            if (IsHttpCodeOk(response))
                 return Ok(response.Content);
 
             return BadRequest(response.Content);
@@ -45,7 +46,8 @@ namespace Web_Api_Authentication.Controllers
         public async Task<IActionResult> GetUserByCode(string token, long codigo)
         {
             var response = await _service.GetUserByCode(token, codigo);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            
+            if (IsHttpCodeOk(response))
                 return Ok(response.Content);
 
             return BadRequest(response.Content);
@@ -53,12 +55,22 @@ namespace Web_Api_Authentication.Controllers
 
         [HttpPost]
         [Route("/post-user")]
-        public async Task<IActionResult> PostUser(UserViewModel model, string token)
+        public async Task<IActionResult> PostUser(string token, UserViewModel model)
         {
-            return Ok("");
+           RestResponse? response = await _service.PostUser(token, model);
+
+            if (IsHttpCodeOk(response))
+                return Ok(response.Content);
+
+            return BadRequest(response.Content);
         }
 
+        private bool IsHttpCodeOk(RestResponse response){
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                 return true;
 
+             return false;
 
+        }
     }
 }

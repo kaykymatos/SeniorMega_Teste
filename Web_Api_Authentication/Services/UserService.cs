@@ -5,12 +5,12 @@ using RestSharp.Authenticators;
 using Web_Api_Authentication.Interfaces.Repository;
 using Web_Api_Authentication.Interfaces.Services;
 using Web_Api_Authentication.Models;
+using Web_Api_Authentication.ViewModels;
 
 namespace Web_Api_Authentication.Services
 {
     public class UserService : IUserService
     {
-        private const string URL_EXTERNAL_API = "http://168.138.231.9:10666";
         private readonly IUserRepository _repository;
 
         public UserService(IUserRepository repository)
@@ -18,7 +18,7 @@ namespace Web_Api_Authentication.Services
             _repository = repository;
         }
         public async Task<RestResponse> GetAllUsers(string token)
-        {
+        {            
             var response = await _repository.GetAllUsers(token);
             return response;
         }
@@ -32,13 +32,24 @@ namespace Web_Api_Authentication.Services
         public async Task<RestResponse> GetUserByCode(string token, long codigo)
         {
             var response = await _repository.GetUserByCode(token, codigo);
-
             return response;
         }
 
-        public Task<UserModel> PostUser(string token, UserModel model)
+        public async Task<RestResponse> PostUser(string token, UserViewModel model)
         {
-            throw new NotImplementedException();
+            var userModel = UserViewModeToUserModel(model);
+            var response = await _repository.PostUser(token, userModel);
+
+            return response;
+        }
+        public UserModel UserViewModeToUserModel(UserViewModel viewModel)
+        {
+            UserModel model = new UserModel();
+            model.Nome = viewModel.Nome;
+            model.Email = viewModel.Email;
+            model.Data_Nascimento = viewModel.Data_Nascimento;
+            model.Data_Criacao = DateTime.Now;
+            return model;
         }
     }
 }
