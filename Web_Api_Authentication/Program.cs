@@ -1,11 +1,24 @@
+using Microsoft.EntityFrameworkCore;
+using Web_Api_Authentication.Data;
+using Web_Api_Authentication.Interfaces.Repository;
+using Web_Api_Authentication.Interfaces.Services;
+using Web_Api_Authentication.Repository;
+using Web_Api_Authentication.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddDbContext<ApiDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Web_Api_Authentication_Context"));
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 
