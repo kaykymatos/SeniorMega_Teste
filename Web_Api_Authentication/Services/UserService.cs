@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using RestSharp;
 using RestSharp.Authenticators;
 using Web_Api_Authentication.Interfaces.Repository;
@@ -12,44 +10,58 @@ namespace Web_Api_Authentication.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _repository;
+        private const string URL_EXTERNAL_API = "http://168.138.231.9:10666";
 
         public UserService(IUserRepository repository)
         {
             _repository = repository;
         }
         public async Task<RestResponse> GetAllUsers(string token)
-        {            
-            var response = await _repository.GetAllUsers(token);
+        {
+            var client = new RestClient(URL_EXTERNAL_API);
+            var request = new RestRequest("cadastro/", Method.Get)
+            .AddHeader("Authorization", $"Bearer {token}");
+            request.RequestFormat = DataFormat.Json;
+            
+            var response = await client.ExecuteAsync(request);
+
             return response;
         }
 
         public async Task<RestResponse> GetToken(LoginModel model)
         {
-            var response = await _repository.GetToken(model);
+            var client = new RestClient(URL_EXTERNAL_API);
+            client.Authenticator = new HttpBasicAuthenticator(model.UserName, model.Password);
+            var request = new RestRequest("get-token/", Method.Get);
+            request.RequestFormat = DataFormat.Json;
+            
+            var response = await client.ExecuteAsync(request);
+            
             return response;
         }
 
         public async Task<RestResponse> GetUserByCode(string token, long codigo)
         {
-            var response = await _repository.GetUserByCode(token, codigo);
-            return response;
-        }
-
-        public async Task<RestResponse> PostUser(string token, UserViewModel model)
-        {
-            var userModel = UserViewModeToUserModel(model);
-            var response = await _repository.PostUser(token, userModel);
+            var client = new RestClient(URL_EXTERNAL_API);
+            var request = new RestRequest($"cadastro/{codigo}", Method.Get)
+            .AddHeader("Authorization", $"Bearer {token}");
+            request.RequestFormat = DataFormat.Json;
+            
+            var response = await client.ExecuteAsync(request);
 
             return response;
         }
-        public UserModel UserViewModeToUserModel(UserViewModel viewModel)
+        public async Task<RestResponse> PostUser(string token, UserModel model)
         {
-            UserModel model = new UserModel();
-            model.Nome = viewModel.Nome;
-            model.Email = viewModel.Email;
-            model.Data_Nascimento = viewModel.Data_Nascimento;
-            model.Data_Criacao = DateTime.Now;
-            return model;
+            model = new UserModel(model.Nome, model.Data_Nascimento);
+            var client = new RestClient(URL_EXTERNAL_API);
+            var request = new RestRequest("cadastro", Method.Post)
+                .AddJsonBody(model)
+                .AddHeader("Authorization", $"Bearer {token}");
+           
+            var response = await client.ExecuteAsync(request);
+
+            return response;
         }
     }
 }

@@ -12,8 +12,8 @@ using Web_Api_Authentication.Data;
 namespace Web_Api_Authentication.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20220806151603_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20220807155605_UserEntityModified")]
+    partial class UserEntityModified
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,19 +32,13 @@ namespace Web_Api_Authentication.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Codigo"), 1L, 1);
 
-                    b.Property<DateTime>("Data_Criacao")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("Data_Nascimento")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Codigo");
 

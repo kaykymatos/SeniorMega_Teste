@@ -9,7 +9,7 @@ namespace Web_Api_Authentication.Interfaces.Services
         Task<RestResponse> GetAllUsers(string token);
         Task<RestResponse> GetUserByCode(string token, long codigo);
         Task<RestResponse> GetToken(LoginModel model);
-        Task<RestResponse> PostUser(string token, UserViewModel model);
+        Task<RestResponse> PostUser(string token, UserModel model);
 
 
     }

@@ -22,7 +22,7 @@ namespace Web_Api_Authentication.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Web_Api_Authentication.Models.UserModel", b =>
+            modelBuilder.Entity("Web_Api_Authentication.Models.UserEntityModel", b =>
                 {
                     b.Property<long>("Codigo")
                         .ValueGeneratedOnAdd()
@@ -30,19 +30,13 @@ namespace Web_Api_Authentication.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Codigo"), 1L, 1);
 
-                    b.Property<DateTime>("Data_Criacao")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("Data_Nascimento")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Codigo");
 

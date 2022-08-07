@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using RestSharp;
 using Web_Api_Authentication.Interfaces.Services;
 using Web_Api_Authentication.Models;
@@ -46,7 +45,7 @@ namespace Web_Api_Authentication.Controllers
         public async Task<IActionResult> GetUserByCode(string token, long codigo)
         {
             var response = await _service.GetUserByCode(token, codigo);
-            
+
             if (IsHttpCodeOk(response))
                 return Ok(response.Content);
 
@@ -55,9 +54,9 @@ namespace Web_Api_Authentication.Controllers
 
         [HttpPost]
         [Route("/post-user")]
-        public async Task<IActionResult> PostUser(string token, UserViewModel model)
+        public async Task<IActionResult> PostUser(string token, UserModel model)
         {
-           RestResponse? response = await _service.PostUser(token, model);
+            var response = await _service.PostUser(token, model);
 
             if (IsHttpCodeOk(response))
                 return Ok(response.Content);
@@ -65,11 +64,12 @@ namespace Web_Api_Authentication.Controllers
             return BadRequest(response.Content);
         }
 
-        private bool IsHttpCodeOk(RestResponse response){
+        private bool IsHttpCodeOk(RestResponse response)
+        {
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                 return true;
+                return true;
 
-             return false;
+            return false;
 
         }
     }
