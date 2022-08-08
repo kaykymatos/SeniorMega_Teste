@@ -53,7 +53,6 @@ namespace Web_Api_Authentication.Services
         }
         public async Task<RestResponse> PostUser(string token, UserModel model)
         {
-            model = new UserModel(model.Nome, model.Data_Nascimento);
             var client = new RestClient(URL_EXTERNAL_API);
             var request = new RestRequest("cadastro", Method.Post)
                 .AddJsonBody(model)
