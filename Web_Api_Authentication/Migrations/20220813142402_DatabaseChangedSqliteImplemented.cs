@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Web_Api_Authentication.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class DatabaseChangedSqliteImplemented : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,12 +13,12 @@ namespace Web_Api_Authentication.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Codigo = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Data_Nascimento = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Data_Criacao = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Codigo = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Nome = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Data_Nascimento = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Data_Criacao = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

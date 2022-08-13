@@ -24,9 +24,8 @@ builder.Services.AddControllers(options => options.SuppressImplicitRequiredAttri
 
 builder.Services.AddDbContext<ApiDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Web_Api_Authentication_Context"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("Web_Api_Authentication_Context"));
 });
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
             {

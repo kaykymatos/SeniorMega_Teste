@@ -1,3 +1,7 @@
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestSharp;
@@ -59,16 +63,17 @@ namespace Web_Api_Authentication.Controllers
         public async Task<IActionResult> PostUser(string token, UserModel model)
         {
             var response = await _service.PostUser(token, model);
-
-            if (IsHttpCodeOk(response))
+           
+                if(response.IsSuccessful)
                 return Ok(response.Content);
 
-            return BadRequest(response.Content);
+                return BadRequest(response.Content);
+            
         }
 
         private bool IsResponseNull(List<UserEntityModel> response)
         {
-            if (response.Count >= 1)
+            if (response.Count >= 1&& response.GetType()== typeof(List<UserEntityModel>))
                 return true;
 
             return false;

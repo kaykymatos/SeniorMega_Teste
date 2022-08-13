@@ -1,6 +1,0 @@
-
-                    Código: 2, 
-                    Nome: Teste Postman,
-                    E-mail:postman@gmail.com, 
-                    Data de Nscimento: 04/09/1958 03:00:00 
-                    Data de criação: 01/12/2021 11:54:21

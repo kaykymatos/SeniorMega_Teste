@@ -24,7 +24,12 @@ namespace Web_Api_Authentication.Services
             .AddHeader("Authorization", $"Bearer {token}");
 
             var response = await client.GetAsync<List<UserEntityModel>>(request);
-            WriteTxtFileWithDatabase(response, "GetllData");
+
+            foreach (var item in response)
+            {
+                var itemcCnvert = ConvertUserEntityModelToDatabase(item);
+                _repository.PostUser(itemcCnvert);
+            }
             return response;
 
         }
@@ -47,13 +52,13 @@ namespace Web_Api_Authentication.Services
             .AddHeader("Authorization", $"Bearer {token}");
 
             var response = await client.GetAsync<List<UserEntityModel>>(request);
-            WriteTxtFileWithDatabase(response, "GetOneUser");
+            
+
             return response;
         }
         public async Task<RestResponse> PostUser(string token, UserModel model)
         {
 
-            var userModelNew = ConvertUserModelToUserEntity(model);
             var client = new RestClient(URL_EXTERNAL_API);
             var request = new RestRequest("cadastro", Method.Post)
                 .AddHeader("Authorization", $"Bearer {token}")
@@ -65,31 +70,16 @@ namespace Web_Api_Authentication.Services
             return response;
         }
 
-        public UserEntityModel ConvertUserModelToUserEntity(UserModel model)
+        public UserEntityModel ConvertUserEntityModelToDatabase(UserEntityModel model)
         {
             var newModel = new UserEntityModel
             {
                 Nome = model.Nome,
                 Email = model.Email,
                 Data_Nascimento = model.Data_Nascimento,
-                Data_Criacao = DateTime.Now
+                Data_Criacao = model.Data_Criacao
             };
             return newModel;
-        }
-        public void WriteTxtFileWithDatabase(List<UserEntityModel> response, String nameTxt)
-        {
-            using (TextWriter tw = new StreamWriter($"{nameTxt}.txt"))
-            {
-                foreach (var item in response)
-                {
-                    tw.WriteLine(string.Format(@$"
-                    Código: {item.Codigo}, 
-                    Nome: {item.Nome},
-                    E-mail: {item.Email}, 
-                    Data de Nascimento: {item.Data_Nascimento} 
-                    Data de Criação: {item.Data_Criacao}"));
-                }
-            }
-        }
+        }       
     }
 }
