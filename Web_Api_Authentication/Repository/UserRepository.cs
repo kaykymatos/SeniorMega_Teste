@@ -19,16 +19,17 @@ namespace Web_Api_Authentication.Repository
             return response;
         }
 
-        public async Task<UserEntityModel> GetUserByCode(long codigo)
+        public async Task<IEnumerable<UserEntityModel>> GetUserByCode(long codigo)
         {
-            var response = await _context.Users.Where(x => x.Codigo == codigo).FirstOrDefaultAsync();
+            var response = await _context.Users.Where(x => x.Codigo == codigo).ToListAsync();
             return response;
         }
 
-        public void PostUser(UserEntityModel model)
+        public void PostUser(UserEntityModel item, UserEntityModel model)
         {
-         _context.Users.Add(model);
-         _context.SaveChanges();
+                _context.Users.Add(model);
+                _context.SaveChanges();
+            
         }
     }
 }

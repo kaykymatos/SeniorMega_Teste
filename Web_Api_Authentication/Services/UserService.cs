@@ -23,19 +23,32 @@ namespace Web_Api_Authentication.Services
             var request = new RestRequest("cadastro/", Method.Get)
             .AddHeader("Authorization", $"Bearer {token}");
 
-            var response = await client.GetAsync<List<UserEntityModel>>(request);
-
-            foreach (var item in response)
+            var verifyException = client.Execute<List<UserEntityModel>>(request).ErrorException;
+            if (verifyException != null)
             {
-                var itemcCnvert = ConvertUserEntityModelToDatabase(item);
-                _repository.PostUser(itemcCnvert);
+                return new List<UserEntityModel>();
+
             }
-            return response;
+            else
+            {
+                var response = await client.GetAsync<List<UserEntityModel>>(request);
+                foreach (var item in response)
+                {
+                    var itemcCnvert = ConvertUserEntityModelToDatabase(item);
+                    _repository.PostUser(item, itemcCnvert);
+                }
+                return response;
+            }
+
+
+
 
         }
 
         public async Task<RestResponse> GetToken(LoginModel model)
         {
+            model.UserName = "Kayky";
+            model.Password = "04571082584";
             var client = new RestClient(URL_EXTERNAL_API);
             client.Authenticator = new HttpBasicAuthenticator(model.UserName, model.Password);
             var request = new RestRequest("get-token/", Method.Get);
@@ -45,19 +58,26 @@ namespace Web_Api_Authentication.Services
             return response;
         }
 
-        public async Task<List<UserEntityModel>> GetUserByCode(string token, long codigo)
+        public async Task<List<UserEntityModel>> GetUserByCode(long codigo, string token)
         {
             var client = new RestClient(URL_EXTERNAL_API);
             var request = new RestRequest($"cadastro/{codigo}", Method.Get)
             .AddHeader("Authorization", $"Bearer {token}");
 
-            var response = await client.GetAsync<List<UserEntityModel>>(request);
-            
+            var verifyException = client.Execute<List<UserEntityModel>>(request).ErrorException;
+            if (verifyException != null)
+            {
+                return new List<UserEntityModel>();
 
-            return response;
+            }
+            else
+            {
+                return await client.GetAsync<List<UserEntityModel>>(request);
+            }
         }
         public async Task<RestResponse> PostUser(string token, UserModel model)
         {
+
 
             var client = new RestClient(URL_EXTERNAL_API);
             var request = new RestRequest("cadastro", Method.Post)
@@ -80,6 +100,6 @@ namespace Web_Api_Authentication.Services
                 Data_Criacao = model.Data_Criacao
             };
             return newModel;
-        }       
+        }
     }
 }

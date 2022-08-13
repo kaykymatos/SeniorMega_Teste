@@ -43,19 +43,19 @@ namespace Web_Api_Authentication.Controllers
             if (IsResponseNull(response))
                 return Ok(response);
 
-            return BadRequest(response);
+            return BadRequest("Usuários não encontrados!");
         }
 
         [HttpGet]
         [Route("/get-user-by-id")]
         public async Task<IActionResult> GetUserByCode(string token, long codigo)
         {
-            var response = await _service.GetUserByCode(token, codigo);
+            var response = await _service.GetUserByCode(codigo,token);
 
             if (IsResponseNull(response))
                 return Ok(response);
 
-            return NotFound(response);
+            return NotFound("Usuário não encontrado, tente com outro código!");
         }
 
         [HttpPost]
@@ -73,7 +73,7 @@ namespace Web_Api_Authentication.Controllers
 
         private bool IsResponseNull(List<UserEntityModel> response)
         {
-            if (response.Count >= 1&& response.GetType()== typeof(List<UserEntityModel>))
+            if (response.Count >= 1)
                 return true;
 
             return false;
