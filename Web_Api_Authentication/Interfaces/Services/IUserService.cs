@@ -6,8 +6,8 @@ namespace Web_Api_Authentication.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<RestResponse> GetAllUsers(string token);
-        Task<RestResponse> GetUserByCode(string token, long codigo);
+        Task<List<UserEntityModel>> GetAllUsers(string token);
+        Task<List<UserEntityModel>> GetUserByCode(string token, long codigo);
         Task<RestResponse> GetToken(LoginModel model);
         Task<RestResponse> PostUser(string token, UserModel model);
 

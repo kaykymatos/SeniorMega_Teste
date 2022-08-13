@@ -1,0 +1,54 @@
+
+                    Código: 3, 
+                    Nome: Teste api,
+                    E-mail:api@gmail.com, 
+                    Data de Nscimento: 21/02/2004 03:00:00 
+                    Data de criação: 01/12/2021 11:54:21
+
+                    Código: 7, 
+                    Nome: Teste postman,
+                    E-mail:testepostman@gmail.com, 
+                    Data de Nscimento: 02/03/2004 03:00:00 
+                    Data de criação: 18/11/0011 07:00:00
+
+                    Código: 1, 
+                    Nome: Ezequiel Oliveira,
+                    E-mail:ezequiel@gmail.com, 
+                    Data de Nscimento: 04/09/1958 03:00:00 
+                    Data de criação: 01/12/2021 11:54:21
+
+                    Código: 8, 
+                    Nome: Kayky Matos,
+                    E-mail:kayky.m.santana@gmail.com, 
+                    Data de Nscimento: 18/01/2004 03:00:00 
+                    Data de criação: 12/08/2022 21:40:00
+
+                    Código: 2, 
+                    Nome: Teste Postman,
+                    E-mail:postman@gmail.com, 
+                    Data de Nscimento: 04/09/1958 03:00:00 
+                    Data de criação: 01/12/2021 11:54:21
+
+                    Código: 4, 
+                    Nome: Teste api_2,
+                    E-mail:api_2@gmail.com, 
+                    Data de Nscimento: 21/02/2004 03:00:00 
+                    Data de criação: 01/12/2021 11:54:21
+
+                    Código: 5, 
+                    Nome: Teste api_3,
+                    E-mail:api_3@gmail.com, 
+                    Data de Nscimento: 21/02/2004 03:00:00 
+                    Data de criação: 01/12/2021 03:00:00
+
+                    Código: 6, 
+                    Nome: Teste postman,
+                    E-mail:testepostman@gmail.com, 
+                    Data de Nscimento: 02/03/2004 03:00:00 
+                    Data de criação: 18/11/0011 07:00:00
+
+                    Código: 9, 
+                    Nome: Kayky Matos2,
+                    E-mail:kayky.m.santana@gmail.com, 
+                    Data de Nscimento: 18/01/2004 03:00:00 
+                    Data de criação: 12/08/2022 21:40:00

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Web_Api_Authentication.Data;
 
@@ -11,13 +12,14 @@ using Web_Api_Authentication.Data;
 namespace Web_Api_Authentication.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220810001051_UserEntityModelNewImplementations")]
+    partial class UserEntityModelNewImplementations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.8")
+                .HasAnnotation("ProductVersion", "6.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -47,7 +49,7 @@ namespace Web_Api_Authentication.Migrations
 
                     b.HasKey("Codigo");
 
-                    b.ToTable("Users_Table");
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }

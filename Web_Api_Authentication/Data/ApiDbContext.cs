@@ -8,6 +8,7 @@ namespace Web_Api_Authentication.Data
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
         {
         }
+
         public DbSet<UserEntityModel> Users { get; set; }
     }
 }

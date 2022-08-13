@@ -21,13 +21,14 @@ namespace Web_Api_Authentication.Repository
 
         public async Task<UserEntityModel> GetUserByCode(long codigo)
         {
-            UserEntityModel? response = await _context.Users.Where(x => x.Codigo == codigo).FirstOrDefaultAsync();
+            var response = await _context.Users.Where(x => x.Codigo == codigo).FirstOrDefaultAsync();
             return response;
         }
 
         public void PostUser(UserEntityModel model)
         {
          _context.Users.Add(model);
+         _context.SaveChanges();
         }
     }
 }
