@@ -1,4 +1,5 @@
-using System.Text.Json.Nodes;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using RestSharp;
 using RestSharp.Authenticators;
 using Web_Api_Authentication.Interfaces.Repository;
@@ -12,6 +13,7 @@ namespace Web_Api_Authentication.Services
     {
         private readonly IUserRepository _repository;
         private const string URL_EXTERNAL_API = "http://168.138.231.9:10666";
+        private const string excelFilePath = "./Usuarios_API.xlsx";
 
         public UserService(IUserRepository repository)
         {
@@ -32,23 +34,18 @@ namespace Web_Api_Authentication.Services
             else
             {
                 var response = await client.GetAsync<List<UserEntityModel>>(request);
+                CreateExcelTable(response);
                 foreach (var item in response)
                 {
-                    var itemcCnvert = ConvertUserEntityModelToDatabase(item);
-                    _repository.PostUser(item, itemcCnvert);
+                    var itemConvert = ConvertUserEntityModelToDatabase(item);
+                    _repository.PostUser(itemConvert);
                 }
                 return response;
             }
-
-
-
-
         }
 
         public async Task<RestResponse> GetToken(LoginModel model)
         {
-            model.UserName = "Kayky";
-            model.Password = "04571082584";
             var client = new RestClient(URL_EXTERNAL_API);
             client.Authenticator = new HttpBasicAuthenticator(model.UserName, model.Password);
             var request = new RestRequest("get-token/", Method.Get);
@@ -101,5 +98,52 @@ namespace Web_Api_Authentication.Services
             };
             return newModel;
         }
+        public static void CreateExcelTable(List<UserEntityModel> models)
+        {
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage excel = new ExcelPackage();
+            var usersTableExcel = excel.Workbook.Worksheets.Add("Usuarios");
+            usersTableExcel.TabColor = System.Drawing.Color.Black;
+            usersTableExcel.DefaultRowHeight = 12;
+
+            usersTableExcel.Row(1).Height = 20;
+            usersTableExcel.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            usersTableExcel.Row(1).Style.Font.Bold = true;
+
+            usersTableExcel.Cells[1, 1].Value = "ID";
+            usersTableExcel.Cells[1, 2].Value = "Nome";
+            usersTableExcel.Cells[1, 3].Value = "E-mail";
+            usersTableExcel.Cells[1, 4].Value = "Data_Nascimento";
+            usersTableExcel.Cells[1, 5].Value = "Data_Criacao";
+
+            int index = 2;
+            foreach (var item in models)
+            {
+                usersTableExcel.Cells[index, 1].Value = item.Codigo.ToString();
+                usersTableExcel.Cells[index, 2].Value = item.Nome.ToString();
+                usersTableExcel.Cells[index, 3].Value = item.Email.ToString();
+                usersTableExcel.Cells[index, 4].Value = item.Data_Nascimento.ToString();
+                usersTableExcel.Cells[index, 5].Value = item.Data_Criacao.ToString();
+                index++;
+            }
+            usersTableExcel.Column(1).AutoFit();
+            usersTableExcel.Column(2).AutoFit();
+            usersTableExcel.Column(3).AutoFit();
+            usersTableExcel.Column(4).AutoFit();
+            usersTableExcel.Column(5).AutoFit();
+
+            if (File.Exists(excelFilePath))
+                File.Delete(excelFilePath);
+
+            FileStream objFileStream = File.Create(excelFilePath);
+            objFileStream.Close();
+
+            File.WriteAllBytes(excelFilePath, excel.GetAsByteArray());
+
+            excel.Dispose();
+        }
+
+       
     }
 }

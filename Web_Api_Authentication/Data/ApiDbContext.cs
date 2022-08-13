@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Web_Api_Authentication.Models;
 
 namespace Web_Api_Authentication.Data

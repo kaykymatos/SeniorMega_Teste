@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Web_Api_Authentication.Data;
 using Web_Api_Authentication.Interfaces.Repository;
 using Web_Api_Authentication.Models;
@@ -25,11 +26,10 @@ namespace Web_Api_Authentication.Repository
             return response;
         }
 
-        public void PostUser(UserEntityModel item, UserEntityModel model)
+        public async void PostUser(UserEntityModel model)
         {
-                _context.Users.Add(model);
-                _context.SaveChanges();
-            
+            _context.Users.Add(model);
+            _context.SaveChanges();
         }
     }
 }
