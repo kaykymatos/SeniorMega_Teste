@@ -1,3 +1,7 @@
+using System.Data;
+using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using RestSharp;
@@ -46,6 +50,8 @@ namespace Web_Api_Authentication.Services
 
         public async Task<RestResponse> GetToken(LoginModel model)
         {
+            model.UserName = "Kayky";
+            model.Password = "04571082584";
             var client = new RestClient(URL_EXTERNAL_API);
             client.Authenticator = new HttpBasicAuthenticator(model.UserName, model.Password);
             var request = new RestRequest("get-token/", Method.Get);
@@ -72,19 +78,31 @@ namespace Web_Api_Authentication.Services
                 return await client.GetAsync<List<UserEntityModel>>(request);
             }
         }
-        public async Task<RestResponse> PostUser(string token, UserModel model)
-        {
+        public async Task<string> PostUser(string token, UserModel model)
+        {            
 
+            string urlRequest = string.Format($"{URL_EXTERNAL_API}/cadastro");
+            WebRequest requestObject = WebRequest.Create(urlRequest);
+            requestObject.Headers.Add("Authorization", $"Bearer {token}");
+            requestObject.Method = "POST";
+            requestObject.ContentType = "application/json";
 
-            var client = new RestClient(URL_EXTERNAL_API);
-            var request = new RestRequest("cadastro", Method.Post)
-                .AddHeader("Authorization", $"Bearer {token}")
-                .AddHeader(URL_EXTERNAL_API, URL_EXTERNAL_API)
-                .AddJsonBody(model);
+            var newObject = ConvertUserModelToPostApiModel(model);
+            string dataObject = JsonSerializer.Serialize(newObject);
 
-            var response = await client.PostAsync(request);
+            using (var streWriter = new StreamWriter(requestObject.GetRequestStream()))
+            {
+                streWriter.Write(dataObject);
+                streWriter.Flush();
+                streWriter.Close();
 
-            return response;
+                var responseRequestStream = (HttpWebResponse)requestObject.GetResponse();
+                using (var streReader = new StreamReader(responseRequestStream.GetResponseStream()))
+                {
+                    var reader = streReader.ReadToEnd();
+                    return reader;
+                }
+            }
         }
 
         public UserEntityModel ConvertUserEntityModelToDatabase(UserEntityModel model)
@@ -97,6 +115,17 @@ namespace Web_Api_Authentication.Services
                 Data_Criacao = model.Data_Criacao
             };
             return newModel;
+        }
+        public PostModel ConvertUserModelToPostApiModel(UserModel model)
+        {
+            var postModel = new PostModel
+            {
+                Nome = model.Nome,
+                Email = model.Email,
+                Data_Nascimento = model.Data_Nascimento.ToString("yyyy-MM-dd"),
+                Data_Criacao = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            };
+            return postModel;
         }
         public static void CreateExcelTable(List<UserEntityModel> models)
         {
@@ -144,6 +173,6 @@ namespace Web_Api_Authentication.Services
             excel.Dispose();
         }
 
-       
+
     }
 }

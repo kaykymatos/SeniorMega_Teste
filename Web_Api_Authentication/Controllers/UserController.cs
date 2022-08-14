@@ -50,7 +50,7 @@ namespace Web_Api_Authentication.Controllers
         [Route("/get-user-by-id")]
         public async Task<IActionResult> GetUserByCode(string token, long codigo)
         {
-            var response = await _service.GetUserByCode(codigo,token);
+            var response = await _service.GetUserByCode(codigo, token);
 
             if (IsResponseNull(response))
                 return Ok(response);
@@ -62,13 +62,10 @@ namespace Web_Api_Authentication.Controllers
         [Route("/post-user")]
         public async Task<IActionResult> PostUser(string token, UserModel model)
         {
-            var response = await _service.PostUser(token, model);
+                var response = await _service.PostUser(token, model);
+                return Ok(response);
            
-                if(response.IsSuccessful)
-                return Ok(response.Content);
 
-                return BadRequest(response.Content);
-            
         }
 
         private bool IsResponseNull(List<UserEntityModel> response)
