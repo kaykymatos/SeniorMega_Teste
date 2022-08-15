@@ -7,7 +7,6 @@ namespace Web_Api_Authentication.ViewModels
         public string Nome { get; set; } = default!;
         public string Email { get; set; } = default!;
         public DateTime Data_Nascimento { get; set; }
-        private DateTime Data_Criacao { get; set; } = DateTime.UtcNow;
 
     }
 }

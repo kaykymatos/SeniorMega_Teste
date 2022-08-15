@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Web_Api_Authentication.Data;
 using Web_Api_Authentication.Interfaces.Repository;
 using Web_Api_Authentication.Models;
@@ -13,21 +14,11 @@ namespace Web_Api_Authentication.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<UserEntityModel>> GetAllUsers()
+        public async void PostUser(UserEntityModel model)
         {
-            var response = await _context.Users.ToListAsync();
-            return response;
-        }
+            _context.Users.Add(model);
+            await _context.SaveChangesAsync();
 
-        public async Task<UserEntityModel> GetUserByCode(long codigo)
-        {
-            UserEntityModel? response = await _context.Users.Where(x => x.Codigo == codigo).FirstOrDefaultAsync();
-            return response;
-        }
-
-        public void PostUser(UserEntityModel model)
-        {
-         _context.Users.Add(model);
         }
     }
 }
