@@ -2,9 +2,11 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Xml;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestSharp;
+using Web_Api_Authentication.ExternalErrors;
 using Web_Api_Authentication.Interfaces.Services;
 using Web_Api_Authentication.Models;
 using Web_Api_Authentication.ViewModels;
@@ -27,7 +29,7 @@ namespace Web_Api_Authentication.Controllers
         [Route("/get-token")]
         public async Task<IActionResult> GetToken(LoginModel model)
         {
-            var response = await _service.GetToken(model);
+            RestResponse response = await _service.GetToken(model);
 
             if (IsHttpCodeOk(response))
                 return Ok(response.Content);
@@ -39,41 +41,35 @@ namespace Web_Api_Authentication.Controllers
         [Route("/get-all-users")]
         public async Task<IActionResult> GetAllUsers(string token)
         {
-            var response = await _service.GetAllUsers(token);
-            if (IsResponseNull(response))
-                return Ok(response);
+            RestResponse response = await _service.GetAllUsers(token);
+            if (_service.IsResponseAnErrorMessage(response.Content))
+                return Ok(response.Content);
 
-            return BadRequest("Usuários não encontrados!");
+            return BadRequest(response.Content);
         }
 
         [HttpGet]
         [Route("/get-user-by-id")]
         public async Task<IActionResult> GetUserByCode(string token, long codigo)
         {
-            var response = await _service.GetUserByCode(codigo, token);
+            RestResponse response = await _service.GetUserByCode(codigo, token);
 
-            if (IsResponseNull(response))
-                return Ok(response);
+            if (_service.IsResponseAnErrorMessage(response.Content!))
+                return Ok(response.Content!);
 
-            return NotFound("Usuário não encontrado, tente com outro código!");
+            return NotFound(response.Content);
         }
 
         [HttpPost]
         [Route("/post-user")]
-        public async Task<IActionResult> PostUser(string token, UserModel model)
+        public IActionResult PostUser(string token, UserModel model)
         {
-                var response = await _service.PostUser(token, model);
+            object response = _service.PostUser(token, model);
+
+            if (_service.IsResponseAnErrorMessage(response.ToString()!))
                 return Ok(response);
-           
 
-        }
-
-        private bool IsResponseNull(List<UserEntityModel> response)
-        {
-            if (response.Count >= 1)
-                return true;
-
-            return false;
+            return BadRequest(response);
 
         }
         private bool IsHttpCodeOk(RestResponse response)

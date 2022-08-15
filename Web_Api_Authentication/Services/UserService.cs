@@ -6,9 +6,11 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using RestSharp;
 using RestSharp.Authenticators;
+using Web_Api_Authentication.ExternalErrors;
 using Web_Api_Authentication.Interfaces.Repository;
 using Web_Api_Authentication.Interfaces.Services;
 using Web_Api_Authentication.Models;
+using Web_Api_Authentication.Validation;
 using Web_Api_Authentication.ViewModels;
 
 namespace Web_Api_Authentication.Services
@@ -23,63 +25,82 @@ namespace Web_Api_Authentication.Services
         {
             _repository = repository;
         }
-        public async Task<List<UserEntityModel>> GetAllUsers(string token)
+        public async Task<RestResponse> GetAllUsers(string token)
         {
-            var client = new RestClient(URL_EXTERNAL_API);
-            var request = new RestRequest("cadastro/", Method.Get)
-            .AddHeader("Authorization", $"Bearer {token}");
+            RestResponse tokenError = new RestResponse();
+            ErrorMessagesExternalApi? valicatioToken = PostValidationModel.ValidationToken(token);
 
-            var verifyException = client.Execute<List<UserEntityModel>>(request).ErrorException;
-            if (verifyException != null)
+            if (valicatioToken != null)
             {
-                return new List<UserEntityModel>();
-
+                tokenError.Content = "Token Não pode ser nulo";
+                return tokenError;
             }
-            else
+
+            RestClient client = new RestClient(URL_EXTERNAL_API);
+            RestRequest request = new RestRequest("cadastro/", Method.Get)
+            .AddHeader("Authorization", $"Bearer {token}");
+            RestResponse restResponse = await client.GetAsync(request);
+
+            if (IsResponseAnErrorMessage(restResponse.Content!))
             {
-                var response = await client.GetAsync<List<UserEntityModel>>(request);
-                CreateExcelTable(response);
-                foreach (var item in response)
+                List<UserEntityModel>? response = await client.GetAsync<List<UserEntityModel>>(request);
+                CreateExcelTable(response!);
+                foreach (UserEntityModel item in response!)
                 {
-                    var itemConvert = ConvertUserEntityModelToDatabase(item);
+                    UserEntityModel? itemConvert = ConvertUserEntityModelToDatabase(item);
                     _repository.PostUser(itemConvert);
                 }
-                return response;
+            }
+            return restResponse;
+
+        }
+        public bool IsResponseAnErrorMessage(string response)
+        {
+            try
+            {
+                ErrorMessagesExternalApi? descerializeErrorHeader = JsonSerializer.Deserialize<ErrorMessagesExternalApi>(response);
+                if (descerializeErrorHeader?.Error == null)
+                    return true;
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return true;
             }
         }
 
         public async Task<RestResponse> GetToken(LoginModel model)
         {
-            model.UserName = "Kayky";
-            model.Password = "04571082584";
-            var client = new RestClient(URL_EXTERNAL_API);
+            RestClient client = new RestClient(URL_EXTERNAL_API);
             client.Authenticator = new HttpBasicAuthenticator(model.UserName, model.Password);
-            var request = new RestRequest("get-token/", Method.Get);
+            RestRequest request = new RestRequest("get-token/", Method.Get);
 
-            var response = await client.ExecuteAsync(request);
+            RestResponse response = await client.ExecuteAsync(request);
 
             return response;
         }
 
-        public async Task<List<UserEntityModel>> GetUserByCode(long codigo, string token)
+        public async Task<RestResponse> GetUserByCode(long codigo, string token)
         {
-            var client = new RestClient(URL_EXTERNAL_API);
-            var request = new RestRequest($"cadastro/{codigo}", Method.Get)
+            RestClient client = new RestClient(URL_EXTERNAL_API);
+            RestRequest request = new RestRequest($"cadastro/{codigo}", Method.Get)
             .AddHeader("Authorization", $"Bearer {token}");
 
-            var verifyException = client.Execute<List<UserEntityModel>>(request).ErrorException;
-            if (verifyException != null)
-            {
-                return new List<UserEntityModel>();
+            RestResponse response = await client.ExecuteAsync(request);
 
-            }
-            else
-            {
-                return await client.GetAsync<List<UserEntityModel>>(request);
-            }
+            return response;
+
         }
-        public async Task<string> PostUser(string token, UserModel model)
-        {            
+        public object PostUser(string token, UserModel model)
+        {
+            ErrorMessagesExternalApi? validationModel = PostValidationModel.ValidationPostModel(model, token);
+            ErrorMessagesExternalApi? validationToken = PostValidationModel.ValidationToken(token);
+            if (validationModel != null)
+                return validationModel;
+
+            if (validationToken != null)
+                return validationToken;
 
             string urlRequest = string.Format($"{URL_EXTERNAL_API}/cadastro");
             WebRequest requestObject = WebRequest.Create(urlRequest);
@@ -96,7 +117,9 @@ namespace Web_Api_Authentication.Services
                 streWriter.Flush();
                 streWriter.Close();
 
+
                 var responseRequestStream = (HttpWebResponse)requestObject.GetResponse();
+
                 using (var streReader = new StreamReader(responseRequestStream.GetResponseStream()))
                 {
                     var reader = streReader.ReadToEnd();
@@ -107,7 +130,7 @@ namespace Web_Api_Authentication.Services
 
         public UserEntityModel ConvertUserEntityModelToDatabase(UserEntityModel model)
         {
-            var newModel = new UserEntityModel
+            UserEntityModel? newModel = new UserEntityModel
             {
                 Nome = model.Nome,
                 Email = model.Email,
@@ -118,7 +141,7 @@ namespace Web_Api_Authentication.Services
         }
         public PostModel ConvertUserModelToPostApiModel(UserModel model)
         {
-            var postModel = new PostModel
+            PostModel? postModel = new PostModel
             {
                 Nome = model.Nome,
                 Email = model.Email,
@@ -132,7 +155,7 @@ namespace Web_Api_Authentication.Services
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelPackage excel = new ExcelPackage();
-            var usersTableExcel = excel.Workbook.Worksheets.Add("Usuarios");
+            ExcelWorksheet? usersTableExcel = excel.Workbook.Worksheets.Add("Usuarios");
             usersTableExcel.TabColor = System.Drawing.Color.Black;
             usersTableExcel.DefaultRowHeight = 12;
 
@@ -147,7 +170,7 @@ namespace Web_Api_Authentication.Services
             usersTableExcel.Cells[1, 5].Value = "Data_Criacao";
 
             int index = 2;
-            foreach (var item in models)
+            foreach (UserEntityModel item in models)
             {
                 usersTableExcel.Cells[index, 1].Value = item.Codigo.ToString();
                 usersTableExcel.Cells[index, 2].Value = item.Nome.ToString();

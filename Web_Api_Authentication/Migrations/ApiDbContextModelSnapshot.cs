@@ -39,7 +39,7 @@ namespace Web_Api_Authentication.Migrations
 
                     b.HasKey("Codigo");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 #pragma warning restore 612, 618
         }

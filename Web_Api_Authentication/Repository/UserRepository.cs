@@ -14,22 +14,11 @@ namespace Web_Api_Authentication.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<UserEntityModel>> GetAllUsers()
-        {
-            var response = await _context.Users.ToListAsync();
-            return response;
-        }
-
-        public async Task<IEnumerable<UserEntityModel>> GetUserByCode(long codigo)
-        {
-            var response = await _context.Users.Where(x => x.Codigo == codigo).ToListAsync();
-            return response;
-        }
-
         public async void PostUser(UserEntityModel model)
         {
             _context.Users.Add(model);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
         }
     }
 }

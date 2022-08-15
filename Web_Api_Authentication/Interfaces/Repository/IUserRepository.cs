@@ -4,8 +4,6 @@ namespace Web_Api_Authentication.Interfaces.Repository
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<UserEntityModel>> GetAllUsers();
-        Task<IEnumerable<UserEntityModel>> GetUserByCode(long codigo);
         void PostUser(UserEntityModel model);
     }
 }

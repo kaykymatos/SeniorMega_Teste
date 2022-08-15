@@ -6,10 +6,11 @@ namespace Web_Api_Authentication.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<List<UserEntityModel>> GetAllUsers(string token);
-        Task<List<UserEntityModel>> GetUserByCode(long codigo, string token);
+        Task<RestResponse> GetAllUsers(string token);
+        Task<RestResponse> GetUserByCode(long codigo, string token);
         Task<RestResponse> GetToken(LoginModel model);
-        Task<string> PostUser(string token, UserModel model);
+        object PostUser(string token, UserModel model);
+        bool IsResponseAnErrorMessage(string response);
 
 
     }
